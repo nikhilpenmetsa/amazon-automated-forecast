@@ -5,6 +5,7 @@ import com.amazonaws.services.forecast.model.CreatePredictorRequest;
 import com.amazonaws.services.forecast.model.DescribePredictorRequest;
 import com.amazonaws.services.forecast.model.FeaturizationConfig;
 import com.amazonaws.services.forecast.model.InputDataConfig;
+import software.amazon.awssdk.services.forecast.model.SupplementaryFeature; //added 2021-08-17
 import com.amazonaws.services.forecast.model.ResourceNotFoundException;
 import com.google.common.annotations.VisibleForTesting;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,21 @@ public class CreatePredictorHandler extends AbstractPredictionGenerationLambdaHa
         FORECAST_PREDICTOR_ALGORITHM_ARN = forecastPredictorAlgorithmArn;
     }
 
+    // Added 2021-08-17 to use US Holidays and WX featurizations
+
+        
+    // Create 2 SupplementaryFeature objects. 1 for weather, 1 for holiday
+    SupplementaryFeature suppFeatureWeather = new SupplementaryFeature();
+    suppFeatureWeather.setName("weather");
+    suppFeatureWeather.setValue("true");
+
+    SupplementaryFeature suppFeatureHoliday = new SupplementaryFeature();
+    suppFeatureHoliday.setName("holiday");
+    suppFeatureHoliday.setValue("US");
+
+    // End of code added 2021-08-17
+
+
     @VisibleForTesting
     static final int SECONDS_IN_A_DAY = 86400;
 
@@ -50,6 +66,8 @@ public class CreatePredictorHandler extends AbstractPredictionGenerationLambdaHa
         log.info(String.format(
                 "The datasetGroupArn, %s, and forecastFrequency getting from resourceIdMap are [%s], [%s], and [%s]",
                 PREDICTOR_RESOURCE_TYPE, datasetGroupArn, predictorName, dataFrequency));
+
+        
 
 
         // Check if predictor exists
@@ -85,7 +103,10 @@ public class CreatePredictorHandler extends AbstractPredictionGenerationLambdaHa
         CreatePredictorRequest createPredictorRequest = new CreatePredictorRequest()
                 .withForecastHorizon(forecastHorizon)
                 .withFeaturizationConfig(new FeaturizationConfig().withForecastFrequency(forecastFrequency))
-                .withInputDataConfig(new InputDataConfig().withDatasetGroupArn(datasetGroupArn))
+                .withInputDataConfig(new InputDataConfig().withDatasetGroupArn(datasetGroupArn)
+                                                          .withSupplementaryFeatures(suppFeatureWeather) // added 2021-08-17
+                                                          .withSupplementaryFeatures(suppFeatureHoliday) // added 2021-08-17
+				    )
                 .withPredictorName(predictorName);
         if (StringUtils.isBlank(predictorAlgorithmArn)) {
             createPredictorRequest.setPerformAutoML(true);
