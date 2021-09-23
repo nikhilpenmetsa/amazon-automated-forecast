@@ -19,6 +19,7 @@ dependencies {
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
     compile group: 'com.amazonaws', name: 'aws-java-sdk-dynamodb', version: '1.11.715'
     compile group: 'com.amazonaws', name: 'aws-java-sdk-forecast', version: '1.11.715'
+    compile group: 'software.amazon.awssdk', name: 'forecast', version: '2.17.22'    
     compile group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.11.715'
     compile group: 'com.amazonaws', name: 'aws-lambda-java-events', version: '2.2.7'
     compile group: 'com.amazonaws', name: 'aws-lambda-java-log4j2', version: '1.1.0'
